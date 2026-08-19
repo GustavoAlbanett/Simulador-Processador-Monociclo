@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "lib.h"
 
-#define MEM_TAM 256
+#define MEM_TAM 4096
 #define NUM_REGS 8
 
 // MEMORIAS
@@ -70,17 +70,17 @@ int execucao(Instrucao *codigos, int ciclo){
 			printf("Ciclo %d: ADD -> R%d = R%d(%d) + R%d(%d) = %d\n", ciclo, codigos->destino, codigos->reg1, regs[codigos->reg1], codigos->reg2, regs[codigos->reg2], ULA);			
 			break;
 
-		case 1 : // 1     SUB
+		case 1 : //      SUB
 			ULA = regs[codigos->reg1] - regs[codigos->reg2];
 			printf("Ciclo %d: SUB -> R%d = R%d(%d) - R%d(%d) = %d\n", ciclo, codigos->destino, codigos->reg1, regs[codigos->reg1], codigos->reg2, regs[codigos->reg2], ULA);
 			break;
 
-		case 2 : // 2    MUL
+		case 2 : //     MUL
 			ULA = regs[codigos->reg1] * regs[codigos->reg2];
 			printf("Ciclo %d: MUL -> R%d = R%d(%d) * R%d(%d) = %d\n", ciclo, codigos->destino, codigos->reg1, regs[codigos->reg1], codigos->reg2, regs[codigos->reg2], ULA);
 			break;
 
-		case 3 : // 3    DIV
+		case 3 : //     DIV
 			if (regs[codigos->reg2] == 0) {
 				printf("Erro Ciclo %d: divisao por zero.\n", ciclo);
 				exit(0);
@@ -108,11 +108,19 @@ int execucao(Instrucao *codigos, int ciclo){
 			printf("Ciclo %d: CMP NEQ -> R%d = R%d != R%d = %d\n", ciclo, codigos->destino, codigos->reg1, codigos->reg2, ULA);
 			break;
 
-		case 15 : //4   LOAD
+		case 15 : //   LOAD
+			if (regs[codigos->reg1] >= MEM_TAM) {
+     		   printf("Erro Ciclo %d: acesso invalido a memoria (endereco %d)\n", ciclo, regs[codigos->reg1]);
+        		exit(1);
+    		}
 			printf("Ciclo %d: LOAD -> R%d = R%d(%d)\n", ciclo, codigos->destino, codigos->reg1, memoria[regs[codigos->reg1]]);
 			break;
 		
-		case 16 : // 5   STORE
+		case 16 : //    STORE
+    	if (regs[codigos->reg1] >= MEM_TAM) {
+        	printf("Erro Ciclo %d: acesso invalido a memoria (endereco %d)\n", ciclo, regs[codigos->reg1]);
+        	exit(1);
+    	}
 			printf("Ciclo %d: STORE -> Mem[%d] = R%d(%d)\n", ciclo, regs[codigos->reg1], codigos->reg2, regs[codigos->reg2]);
 			break;
 		
@@ -141,7 +149,7 @@ int execucao(Instrucao *codigos, int ciclo){
 				printf("Ciclo %d: JUMP COND -> Pulando para o endereco: %d\n", ciclo, PC);
 				break;
 			}
-			printf("Ciclo %d: JUMP COND NAO REALIZADO", ciclo);
+			printf("Ciclo %d: JUMP COND NAO REALIZADO \n", ciclo);
 			break;
 
 		case 3 : // 3    MOV
